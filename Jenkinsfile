@@ -1,30 +1,31 @@
-node('Node1')
+node
 {
-def Maven_Home= tool name: "Maven3.6.2"
+    def mavenHome = tool name: "maven_3.6.3"
+    def JAVA_HOME = tool name: "jdk8.1"   
+    env.JAVA_HOME = "${JAVA_HOME}" 
 
-stage('CheckoutCode')
+stage ('checkoutcode')
 {
-    git branch: 'development', credentialsId: '2300bcab-7b91-49e0-9d44-c7de5b0928c3', url: 'https://github.com/udaykiranpati/maven-web-application.git'
-}
+git branch: 'development', credentialsId: '1b69de72-6dc0-4394-ba46-6b37ed3a1abb', url: 'https://github.com/bossrachita/maven-web-application.git'
+    }
+stage ('build')
+ {
+          sh "${mavenHome}/bin/mvn clean package"
+ }
 
-stage('Build')
-{
-    sh "${Maven_Home}/bin/mvn clean package"
-}
+stage ('checkcodequality')
+ {
+     sh "${mavenHome}/bin/mvn sonar:sonar"
+        }
 
-stage('SonarQubeReport')
+stage ('store to build artifact')
+   {
+sh "${mavenHome}/bin/mvn deploy"
+         }
+stage ('deploy')
 {
-    sh "${Maven_Home}/bin/mvn sonar:sonar"
-}
-stage('UploadToNexus')
-{
-    sh "${Maven_Home}/bin/mvn deploy"
-}
-    stage('DeployToTomcat')
-{
-        sshagent(['85f5a821-aded-41ae-b0d5-869d03f3a96c']) {
-    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@3.145.181.247:/opt/apache-tomcat-9.0.59/webapps"
+    sshagent(['f732640b-9205-4de6-94cc-bd0f68a30935']) {
+    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@3.110.210.242:/opt/apache-tomcat-9.0.60/webapps/"
 }
 }
-
 }
