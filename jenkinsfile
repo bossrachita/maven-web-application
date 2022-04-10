@@ -1,7 +1,7 @@
 node 
 {
     
-def mavenHome = tool name: "Maven3.6.3"
+def mavenHome = tool name: "Maven_3.6.3"
 jdk = tool name: "java-openjdk_1.8.221"
 env.JAVA_HOME = "${jdk}"
 stage('clonecode')
